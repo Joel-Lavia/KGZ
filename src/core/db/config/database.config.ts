@@ -2,7 +2,7 @@ import { MongooseModuleOptions } from '@nestjs/mongoose';
 
 export const mongoConfig: MongooseModuleOptions = {
  //Url to connect to MongoDB
-  uri: process.env.MONGO_URIL,
+  uri: process.env.MONGO_URL,
   //Create indexation automaticaly if true
   autoIndex:false,
   //Retry to connect to MongoDB if connection failed
