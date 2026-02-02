@@ -1,4 +1,6 @@
 import { MongooseModuleOptions } from '@nestjs/mongoose';
+import  dotenv from 'dotenv';
+dotenv.config();
 
 export const mongoConfig: MongooseModuleOptions = {
  //Url to connect to MongoDB
