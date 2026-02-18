@@ -8,14 +8,15 @@ async function bootstrap() {
   const PORT = process.env.PORT;
   const app = await NestFactory.create(AppModule);
   //===========SWAGGER CONFIG======================
+  app.setGlobalPrefix('KGZ/v1');
   const config = new DocumentBuilder()
     .setTitle('Kin Geek Zone')
-    .setDescription('The cats API description')
+    .setDescription('Kin Geek Zone API Docs')
     .setVersion('1.0')
     .addTag('KGZ')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, documentFactory);
+  SwaggerModule.setup('Kin_Geek_Zone/Api/docs', app, documentFactory);
   //=====================================================
   await app.listen(PORT!, () => console.log(`Port running in PORT : ${PORT}`));
 }
