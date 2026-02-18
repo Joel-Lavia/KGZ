@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import dotenv from 'dotenv';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
 dotenv.config();
 
 async function bootstrap() {
@@ -17,7 +18,16 @@ async function bootstrap() {
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('Kin_Geek_Zone/Api/docs', app, documentFactory);
-  //=====================================================
+  //===================CONFIG NEST VALIDATOR =======================
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      disableErrorMessages: false,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+  //================================================================
   await app.listen(PORT!, () => console.log(`Port running in PORT : ${PORT}`));
 }
 bootstrap();
