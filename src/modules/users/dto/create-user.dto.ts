@@ -11,7 +11,7 @@ import {
 } from 'class-validator';
 import { sexeUsers } from 'src/core/enums/user.enum';
 
-export class CreateUserDto {
+export class RegistrationUserDto {
   @ApiPropertyOptional({
     description: "URL de l'image de profil de l'utilisateur",
     example: 'https://monsite.com/images/profile.jpg',
@@ -42,7 +42,7 @@ export class CreateUserDto {
   })
   @IsString()
   @IsNotEmpty()
-  LastName!: string;
+  lastName!: string;
 
   @ApiPropertyOptional({
     description: "Sexe de l'utilisateur",
@@ -76,12 +76,12 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: "Numéro de téléphone de l'utilisateur",
-    example: '812345678',
-    maxLength: 9,
+    example: '+243812345678',
+    maxLength: 13,
   })
   @IsPhoneNumber()
   @IsString()
   @IsNotEmpty()
-  @MaxLength(9)
+  @MaxLength(13)
   telephone!: string;
 }

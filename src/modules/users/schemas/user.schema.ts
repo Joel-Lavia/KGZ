@@ -1,10 +1,21 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, InferSchemaType } from 'mongoose';
 import { rolesUsers, sexeUsers } from 'src/core/enums/user.enum';
 
-export type userDocument = HydratedDocument<User>;
+export type UserDocument = HydratedDocument<User>;
 
-@Schema()
+@Schema({
+  versionKey: false,
+  toJSON: {
+    transform: (doc, ret: any) => {
+      delete ret.password;
+      delete ret.__v;
+      ret.id = ret._id;
+      delete ret._id;
+      return ret;
+    },
+  },
+})
 export class User {
   @Prop()
   profilImage?: string;
@@ -16,7 +27,7 @@ export class User {
   firstName!: string;
 
   @Prop({ required: true })
-  LastName!: string;
+  lastName!: string;
 
   @Prop({ type: String, enum: Object.values(sexeUsers) })
   sexe?: sexeUsers;
@@ -24,7 +35,7 @@ export class User {
   @Prop()
   email?: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, select: false })
   password!: string;
 
   @Prop({ required: true, unique: true })
@@ -37,4 +48,9 @@ export class User {
   })
   role?: rolesUsers[];
 }
-export const usersChema = SchemaFactory.createForClass(User);
+export type UserDataResponse = InferSchemaType<typeof UsersChema>;
+export type userPublicDataResponse = Omit<
+  InferSchemaType<typeof UsersChema>,
+  'password'
+>;
+export const UsersChema = SchemaFactory.createForClass(User);
