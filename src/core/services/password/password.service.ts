@@ -9,13 +9,12 @@ export class passwordService {
     try {
       const hash = await argon2.hash(password, {
         type: argon2.argon2id,
-        memoryCost: Number(process.env.ARGON_MEMORYCOST),
-        parallelism: Number(process.env.ARGON_PARALLELISM),
-        timeCost: Number(process.env.ARGON_TIMECOAST),
-        hashLength: Number(process.env.ARGON_HASHLENG),
+        memoryCost: parseInt(process.env.ARGON_MEMORYCOAST!, 10),
+        parallelism: parseInt(process.env.ARGON_PARALLELISM!, 10),
+        timeCost: parseInt(process.env.ARGON_TIMECOST!, 10),
+        hashLength: parseInt(process.env.ARGON_HASHLENG!, 10),
         secret: Buffer.from(process.env.ARGON_SECRET!),
       });
-      console.log(`Mot de passe hache ===>${hash}`);
 
       return hash;
     } catch (error: any) {

@@ -9,22 +9,38 @@ import {
 } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { ApiResponse } from 'src/core/interfaces/apiResponse';
+import { passwordService } from 'src/core/services/password/password.service';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private readonly passwordService: passwordService,
+  ) {}
   async create(
     registrationUserDto: RegistrationUserDto,
   ): Promise<ApiResponse<userPublicDataResponse>> {
     try {
-      const user = await this.userModel.create({
+      //===============PASSWORD=========================
+      const password: string = await this.passwordService.hashPasseword(
+        registrationUserDto.password,
+      );
+      console.log(`Mot de passe hache ===>${password}`);
+
+      const verifyUserExiste = await this.userModel.findOne({
+        email: registrationUserDto.email,
+      });
+      console.log('User ===>', verifyUserExiste);
+
+      //===================CREATE USER===================
+      const user: UserDocument = await this.userModel.create({
         profilImage: registrationUserDto.profilImages,
         name: registrationUserDto.name,
         firstName: registrationUserDto.firstName,
         lastName: registrationUserDto.lastName,
         sexe: registrationUserDto.sexe,
         email: registrationUserDto.email,
-        password: registrationUserDto.password,
+        password: password,
         telephone: registrationUserDto.telephone,
       });
       return {
@@ -40,20 +56,20 @@ export class UsersService {
     }
   }
 
-  async findAll():Promise<ApiResponse<userPublicDataResponse[]>> {
-   try {
-     const allUsers = await this.userModel.find();
-     return {
-       status: HttpStatus.FOUND,
-       message: 'Tous les utilisateurs trouvent avec succès.',
-       data: allUsers,
-     };
-   } catch (error:any) {
-     return {
-       status: HttpStatus.INTERNAL_SERVER_ERROR,
-       message: `Une erreur est survenue ${error.message}`,
-     };
-   }
+  async findAll(): Promise<ApiResponse<userPublicDataResponse[]>> {
+    try {
+      const allUsers = await this.userModel.find();
+      return {
+        status: HttpStatus.FOUND,
+        message: 'Tous les utilisateurs trouvent avec succès.',
+        data: allUsers,
+      };
+    } catch (error: any) {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: `Une erreur est survenue ${error.message}`,
+      };
+    }
   }
 
   findOne(id: number) {

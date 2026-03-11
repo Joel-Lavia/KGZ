@@ -30,7 +30,7 @@ async function bootstrap() {
   //================================================================
   await app.listen(PORT!, () =>
     console.log(
-      `Port running in PORT :  ${PORT}, Swagger docs http://localhost:${PORT}/Kin_Geek_Zone/Api/docs`,
+      `API running in PORT : ${PORT}, Swagger docs http://localhost:${PORT}/Kin_Geek_Zone/Api/docs`,
     ),
   );
 }
