@@ -8,6 +8,7 @@ dotenv.config();
 async function bootstrap() {
   const PORT = process.env.PORT;
   const app = await NestFactory.create(AppModule);
+  console.log('JWT_SECRET ===>', process.env.JWT_SECRET);
   //===========SWAGGER CONFIG======================
   app.setGlobalPrefix('KGZ/v1');
   const config = new DocumentBuilder()

@@ -4,9 +4,13 @@ import { AppService } from './app.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { mongoConfig } from './core/db/config/database.config';
 import { UsersModule } from './modules/users/users.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal:true
+    }),
     MongooseModule.forRootAsync({ useFactory: () => mongoConfig }),
     UsersModule,
   ],

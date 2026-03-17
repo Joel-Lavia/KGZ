@@ -10,16 +10,21 @@ import {
 import { Model } from 'mongoose';
 import { ApiResponse } from 'src/core/interfaces/apiResponse';
 import { passwordService } from 'src/core/services/password/password.service';
+import { JwtService } from '@nestjs/jwt';
+import { payloadUser } from 'src/core/interfaces/payload';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private readonly passwordService: passwordService,
+    private jwtService: JwtService,
   ) {}
   async create(
     registrationUserDto: RegistrationUserDto,
-  ): Promise<ApiResponse<userPublicDataResponse>> {
+  ): Promise<
+    ApiResponse<{ user: userPublicDataResponse; acces_token: string }>
+  > {
     try {
       //===============PASSWORD=========================
       const password: string = await this.passwordService.hashPasseword(
@@ -28,43 +33,43 @@ export class UsersService {
       //=============VERIFY USER EXIST====================
       let message: string = 'Un utilisateur existe déjà avec';
 
-      if (registrationUserDto.email) {
-        const emailExist = await this.userModel.exists({
-          email: registrationUserDto.email,
-        });
+      // if (registrationUserDto.email) {
+      //   const emailExist = await this.userModel.exists({
+      //     email: registrationUserDto.email,
+      //   });
 
-        if (emailExist) {
-          return {
-            status: HttpStatus.CONFLICT,
-            message: `${message} ${registrationUserDto.email}`,
-          };
-        }
-      }
+      //   if (emailExist) {
+      //     return {
+      //       status: HttpStatus.CONFLICT,
+      //       message: `${message} ${registrationUserDto.email}`,
+      //     };
+      //   }
+      // }
 
-      if (registrationUserDto.telephone) {
-        const phoneExist = await this.userModel.exists({
-          telephone: registrationUserDto.telephone,
-        });
+      // if (registrationUserDto.telephone) {
+      //   const phoneExist = await this.userModel.exists({
+      //     telephone: registrationUserDto.telephone,
+      //   });
 
-        if (phoneExist) {
-          return {
-            status: HttpStatus.CONFLICT,
-            message: `${message} ${registrationUserDto.telephone}`,
-          };
-        }
-      }
-      if (registrationUserDto.userName) {
-        const userNameExist = await this.userModel.exists({
-          userName: registrationUserDto.userName,
-        });
+      //   if (phoneExist) {
+      //     return {
+      //       status: HttpStatus.CONFLICT,
+      //       message: `${message} ${registrationUserDto.telephone}`,
+      //     };
+      //   }
+      // }
+      // if (registrationUserDto.userName) {
+      //   const userNameExist = await this.userModel.exists({
+      //     userName: registrationUserDto.userName,
+      //   });
 
-        if (userNameExist) {
-          return {
-            status: HttpStatus.CONFLICT,
-            message: `${message} ${registrationUserDto.userName}`,
-          };
-        }
-      }
+      //   if (userNameExist) {
+      //     return {
+      //       status: HttpStatus.CONFLICT,
+      //       message: `${message} ${registrationUserDto.userName}`,
+      //     };
+      //   }
+      // }
       //===================CREATE USER===================
       const user: UserDocument = await this.userModel.create({
         profilImage: registrationUserDto.profilImages,
@@ -77,10 +82,18 @@ export class UsersService {
         password: password,
         telephone: registrationUserDto.telephone,
       });
+      //=============GENERATION TOKEN=====================
+      let paylod: payloadUser = {
+        id: user.id,
+        userName: user.userName,
+        role: user.role ?? [],
+      };
+      const acces_token = await this.jwtService.signAsync(paylod);
+
       return {
         status: HttpStatus.CREATED,
         message: `Enregistrement réussi, bienvenue ${user.name} ${user.lastName}`,
-        data: user,
+        data: { user: user, acces_token: acces_token },
       };
     } catch (error: any) {
       return {
