@@ -3,9 +3,11 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import dotenv from 'dotenv';
+import { PassportModule } from '@nestjs/passport';
 dotenv.config();
 @Module({
   imports: [
+    PassportModule,
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,

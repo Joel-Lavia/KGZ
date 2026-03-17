@@ -20,10 +20,12 @@ export class UsersService {
     private readonly passwordService: passwordService,
     private jwtService: JwtService,
   ) {}
-  async create(
-    registrationUserDto: RegistrationUserDto,
-  ): Promise<
-    ApiResponse<{ user: userPublicDataResponse; acces_token: string }>
+  async create(registrationUserDto: RegistrationUserDto): Promise<
+    ApiResponse<{
+      user: userPublicDataResponse;
+      acces_token: string;
+      refresh_token: string;
+    }>
   > {
     try {
       //===============PASSWORD=========================
@@ -83,17 +85,25 @@ export class UsersService {
         telephone: registrationUserDto.telephone,
       });
       //=============GENERATION TOKEN=====================
-      let paylod: payloadUser = {
+      let payload: payloadUser = {
         id: user.id,
         userName: user.userName,
         role: user.role ?? [],
       };
-      const acces_token = await this.jwtService.signAsync(paylod);
+      const acces_token = await this.jwtService.signAsync(payload);
+      const refresh_token = await this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_REFRESH_TOKEN,
+        expiresIn: '5d',
+      });
 
       return {
         status: HttpStatus.CREATED,
         message: `Enregistrement réussi, bienvenue ${user.name} ${user.lastName}`,
-        data: { user: user, acces_token: acces_token },
+        data: {
+          user: user,
+          acces_token: acces_token,
+          refresh_token: refresh_token,
+        },
       };
     } catch (error: any) {
       return {
