@@ -44,6 +44,9 @@ export class RegistrationUserDto {
   @IsNotEmpty()
   lastName!: string;
 
+  @IsString()
+  userName?: string;
+
   @ApiPropertyOptional({
     description: "Sexe de l'utilisateur",
     enum: sexeUsers,

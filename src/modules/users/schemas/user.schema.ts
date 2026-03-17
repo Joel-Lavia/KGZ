@@ -29,10 +29,13 @@ export class User {
   @Prop({ required: true })
   lastName!: string;
 
+  @Prop({unique:true})
+  userName?: string;
+
   @Prop({ type: String, enum: Object.values(sexeUsers) })
   sexe?: sexeUsers;
 
-  @Prop()
+  @Prop({unique:true})
   email?: string;
 
   @Prop({ required: true, select: false })

@@ -25,19 +25,53 @@ export class UsersService {
       const password: string = await this.passwordService.hashPasseword(
         registrationUserDto.password,
       );
-      console.log(`Mot de passe hache ===>${password}`);
+      //=============VERIFY USER EXIST====================
+      let message: string = 'Un utilisateur existe déjà avec';
 
-      const verifyUserExiste = await this.userModel.findOne({
-        email: registrationUserDto.email,
-      });
-      console.log('User ===>', verifyUserExiste);
+      if (registrationUserDto.email) {
+        const emailExist = await this.userModel.exists({
+          email: registrationUserDto.email,
+        });
 
+        if (emailExist) {
+          return {
+            status: HttpStatus.CONFLICT,
+            message: `${message} ${registrationUserDto.email}`,
+          };
+        }
+      }
+
+      if (registrationUserDto.telephone) {
+        const phoneExist = await this.userModel.exists({
+          telephone: registrationUserDto.telephone,
+        });
+
+        if (phoneExist) {
+          return {
+            status: HttpStatus.CONFLICT,
+            message: `${message} ${registrationUserDto.telephone}`,
+          };
+        }
+      }
+      if (registrationUserDto.userName) {
+        const userNameExist = await this.userModel.exists({
+          userName: registrationUserDto.userName,
+        });
+
+        if (userNameExist) {
+          return {
+            status: HttpStatus.CONFLICT,
+            message: `${message} ${registrationUserDto.userName}`,
+          };
+        }
+      }
       //===================CREATE USER===================
       const user: UserDocument = await this.userModel.create({
         profilImage: registrationUserDto.profilImages,
         name: registrationUserDto.name,
         firstName: registrationUserDto.firstName,
         lastName: registrationUserDto.lastName,
+        userName: registrationUserDto.userName,
         sexe: registrationUserDto.sexe,
         email: registrationUserDto.email,
         password: password,
