@@ -1,9 +1,13 @@
-export enum rolesUsers{
-    ADMIN='Admin',
-    USER='User',
-    SELLER='Seller',
+export enum rolesUsers {
+  ADMIN = 'Admin',
+  USER = 'User',
+  SELLER = 'Seller',
 }
-export enum sexeUsers{
-    MALE='Male',
-    FEMALE='Female',
+export enum sexeUsers {
+  MALE = 'Male',
+  FEMALE = 'Female',
+}
+export enum passWordlenth {
+  MinLength = 15,
+  MaxLength = 20,
 }

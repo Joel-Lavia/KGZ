@@ -4,9 +4,14 @@ import { AuthController } from './auth.controller';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import dotenv from 'dotenv';
 import { PassportModule } from '@nestjs/passport';
+import { MongooseModule } from '@nestjs/mongoose';
+import { User, UsersChema } from 'src/modules/users/schemas/user.schema';
+import { LocalStrategy } from '../strategy/local.strategy';
+import { passwordService } from '../services/password/password.service';
 dotenv.config();
 @Module({
   imports: [
+    MongooseModule.forFeature([{ name: User.name, schema: UsersChema }]),
     PassportModule,
     JwtModule.register({
       global: true,
@@ -15,9 +20,8 @@ dotenv.config();
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
-  exports: [AuthService,JwtModule],
-  
+  providers: [AuthService, LocalStrategy, passwordService],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
 console.log('JWT_SECRETS ===>', process.env.JWT_SECRET);

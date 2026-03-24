@@ -9,7 +9,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { sexeUsers } from 'src/core/enums/user.enum';
+import { passWordlenth, sexeUsers } from 'src/core/enums/user.enum';
 
 export class RegistrationUserDto {
   @ApiPropertyOptional({
@@ -44,6 +44,10 @@ export class RegistrationUserDto {
   @IsNotEmpty()
   lastName!: string;
 
+  @ApiProperty({
+    description: 'Nom utilisateur',
+    example: 'Kindkey87',
+  })
   @IsString()
   userName?: string;
 
@@ -68,13 +72,13 @@ export class RegistrationUserDto {
   @ApiProperty({
     description: "Mot de passe de l'utilisateur",
     example: 'StrongPassword123',
-    minLength: 10,
-    maxLength: 15,
+    minLength: passWordlenth.MinLength,
+    maxLength: passWordlenth.MaxLength,
   })
   @IsString()
   @IsNotEmpty()
-  @MinLength(10)
-  @MaxLength(15)
+  @MinLength(passWordlenth.MinLength)
+  @MaxLength(passWordlenth.MaxLength)
   password!: string;
 
   @ApiProperty({

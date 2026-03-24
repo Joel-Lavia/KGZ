@@ -1,9 +1,104 @@
-import { Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable } from '@nestjs/common';
 import { UpdateAuthDto } from './dto/update-auth.dto';
-import { LoginAuthDto } from './dto/create-auth.dto';
+import { LoginAuthDto } from './dto/login-auth.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { User, UserDocument } from 'src/modules/users/schemas/user.schema';
+import { Model } from 'mongoose';
+import { payloadUser } from '../interfaces/payload';
+import { JwtService } from '@nestjs/jwt';
+import { passwordService } from '../services/password/password.service';
+import { ApiResponse, responseLogin } from '../interfaces/apiResponse';
 
 @Injectable()
 export class AuthService {
+  constructor(
+    @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private jwtService: JwtService,
+    private readonly passwordService: passwordService,
+  ) {}
+  async validateUser(
+    userName: string,
+    password: string,
+    telephone: string,
+  ): Promise<any> {
+    try {
+      const user = await this.userModel.findOne({
+        $and: [
+          { userName: userName },
+          { password: password },
+          { telephone: telephone },
+        ],
+      });
+      if (user && user.password === password) {
+        const { password, ...result } = user;
+        return result;
+      }
+      return null;
+    } catch (error: any) {
+      return { message: `Erreur lors de la connexion ${error.message}` };
+    }
+  }
+  async login(loginDto: LoginAuthDto): Promise<ApiResponse<responseLogin>> {
+    try {
+      //===============VERIFY USER================
+      const user = await this.userModel
+        .findOne({
+          $and: [
+            { userName: loginDto.userName },
+            { telephone: loginDto.telephone },
+          ],
+        })
+        .select('password id userName role');
+
+      if (!user) {
+        return {
+          status: HttpStatus.UNAUTHORIZED,
+          message: `Identifiant incorrect.`,
+        };
+      }
+      //=================VALIDATE PASSWORD==============
+      const validePassWord = await this.passwordService.verifyPassWord(
+        user.password,
+        loginDto.password,
+      );
+      if (!validePassWord) {
+        return {
+          status: HttpStatus.UNAUTHORIZED,
+          message: `Mot de passe incorrecte.`,
+        };
+      }
+      //================PAYLOAD===============
+      let payload: payloadUser = {
+        id: user.id,
+        userName: user.userName,
+        role: user.role ?? [],
+      };
+      //==============GENERATION TOKEN============
+      const [access_token, refresh_token] = await Promise.all([
+        this.jwtService.signAsync(payload),
+        this.jwtService.signAsync(payload, {
+          secret: process.env.JWT_REFRESH_TOKEN,
+          expiresIn: '5d',
+        }),
+      ]);
+
+      return {
+        status: HttpStatus.ACCEPTED,
+        data: { access_token, refresh_token },
+      };
+    } catch (error: any) {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: `Une erreur est survenu ${error.message}`,
+      };
+    }
+  }
+
+
+
+
+  
+
   create(createAuthDto: LoginAuthDto) {
     return 'This action adds a new auth';
   }

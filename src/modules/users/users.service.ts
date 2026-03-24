@@ -22,7 +22,6 @@ export class UsersService {
   ) {}
   async create(registrationUserDto: RegistrationUserDto): Promise<
     ApiResponse<{
-      user: userPublicDataResponse;
       acces_token: string;
       refresh_token: string;
     }>
@@ -35,43 +34,43 @@ export class UsersService {
       //=============VERIFY USER EXIST====================
       let message: string = 'Un utilisateur existe déjà avec';
 
-      // if (registrationUserDto.email) {
-      //   const emailExist = await this.userModel.exists({
-      //     email: registrationUserDto.email,
-      //   });
+      if (registrationUserDto.email) {
+        const emailExist = await this.userModel.exists({
+          email: registrationUserDto.email,
+        });
 
-      //   if (emailExist) {
-      //     return {
-      //       status: HttpStatus.CONFLICT,
-      //       message: `${message} ${registrationUserDto.email}`,
-      //     };
-      //   }
-      // }
+        if (emailExist) {
+          return {
+            status: HttpStatus.CONFLICT,
+            message: `${message} ${registrationUserDto.email}`,
+          };
+        }
+      }
 
-      // if (registrationUserDto.telephone) {
-      //   const phoneExist = await this.userModel.exists({
-      //     telephone: registrationUserDto.telephone,
-      //   });
+      if (registrationUserDto.telephone) {
+        const phoneExist = await this.userModel.exists({
+          telephone: registrationUserDto.telephone,
+        });
 
-      //   if (phoneExist) {
-      //     return {
-      //       status: HttpStatus.CONFLICT,
-      //       message: `${message} ${registrationUserDto.telephone}`,
-      //     };
-      //   }
-      // }
-      // if (registrationUserDto.userName) {
-      //   const userNameExist = await this.userModel.exists({
-      //     userName: registrationUserDto.userName,
-      //   });
+        if (phoneExist) {
+          return {
+            status: HttpStatus.CONFLICT,
+            message: `${message} ${registrationUserDto.telephone}`,
+          };
+        }
+      }
+      if (registrationUserDto.userName) {
+        const userNameExist = await this.userModel.exists({
+          userName: registrationUserDto.userName,
+        });
 
-      //   if (userNameExist) {
-      //     return {
-      //       status: HttpStatus.CONFLICT,
-      //       message: `${message} ${registrationUserDto.userName}`,
-      //     };
-      //   }
-      // }
+        if (userNameExist) {
+          return {
+            status: HttpStatus.CONFLICT,
+            message: `${message} ${registrationUserDto.userName}`,
+          };
+        }
+      }
       //===================CREATE USER===================
       const user: UserDocument = await this.userModel.create({
         profilImage: registrationUserDto.profilImages,
@@ -84,25 +83,27 @@ export class UsersService {
         password: password,
         telephone: registrationUserDto.telephone,
       });
-      //=============GENERATION TOKEN=====================
+      //=============PAYLOAD=====================
       let payload: payloadUser = {
         id: user.id,
         userName: user.userName,
         role: user.role ?? [],
       };
-      const acces_token = await this.jwtService.signAsync(payload);
-      const refresh_token = await this.jwtService.signAsync(payload, {
-        secret: process.env.JWT_REFRESH_TOKEN,
-        expiresIn: '5d',
-      });
+      //=============GENERATION TOKEN============
+      const [acces_token, refresh_token] = await Promise.all([
+        this.jwtService.signAsync(payload),
+        this.jwtService.signAsync(payload, {
+          secret: process.env.JWT_REFRESH_TOKEN,
+          expiresIn: '5d',
+        }),
+      ]);
 
       return {
         status: HttpStatus.CREATED,
         message: `Enregistrement réussi, bienvenue ${user.name} ${user.lastName}`,
         data: {
-          user: user,
-          acces_token: acces_token,
-          refresh_token: refresh_token,
+          acces_token,
+          refresh_token,
         },
       };
     } catch (error: any) {
