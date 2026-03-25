@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UsersChema } from 'src/modules/users/schemas/user.schema';
 import { LocalStrategy } from '../strategy/local.strategy';
 import { passwordService } from '../services/password/password.service';
+import { userJwtStrategy } from '../strategy/user.JwtStrategy';
 dotenv.config();
 @Module({
   imports: [
@@ -20,7 +21,7 @@ dotenv.config();
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, passwordService],
+  providers: [AuthService, LocalStrategy, passwordService, userJwtStrategy],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

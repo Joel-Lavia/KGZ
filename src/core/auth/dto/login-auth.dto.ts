@@ -1,12 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsPhoneNumber,
   IsString,
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { passWordlenth } from 'src/core/enums/user.enum';
+import { audAuth, passWordlenth } from 'src/core/enums/user.enum';
 
 export class LoginAuthDto {
   @ApiProperty({
@@ -36,4 +38,8 @@ export class LoginAuthDto {
   @MinLength(passWordlenth.MinLength)
   @MaxLength(passWordlenth.MaxLength)
   password!: string;
+
+  @IsOptional()
+  @IsEnum(audAuth)
+  audUser?: audAuth;
 }

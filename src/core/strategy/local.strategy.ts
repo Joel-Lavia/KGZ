@@ -20,7 +20,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       telephone,
     );
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException("testst");
     }
     return user;
   }

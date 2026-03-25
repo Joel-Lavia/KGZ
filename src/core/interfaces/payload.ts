@@ -1,7 +1,8 @@
-import { rolesUsers } from '../enums/user.enum';
+import { audAuth, rolesUsers } from '../enums/user.enum';
 
 export interface payloadUser {
-  id: string;
+  sub: string;
   userName?: string;
   role: rolesUsers[];
+  aud:audAuth
 }

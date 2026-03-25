@@ -85,9 +85,10 @@ export class UsersService {
       });
       //=============PAYLOAD=====================
       let payload: payloadUser = {
-        id: user.id,
+        sub: user.id,
         userName: user.userName,
         role: user.role ?? [],
+        aud:registrationUserDto.audUser!
       };
       //=============GENERATION TOKEN============
       const [acces_token, refresh_token] = await Promise.all([
@@ -130,8 +131,12 @@ export class UsersService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne() {
+    try {
+      const user =  await this.userModel.findById()
+    } catch (error) {
+      
+    }
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

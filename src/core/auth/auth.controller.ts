@@ -18,15 +18,15 @@ import { AuthGuard } from '@nestjs/passport';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // @UseGuards(AuthGuard('local'))
   @Post('Login')
   async login(@Body() loginDto: LoginAuthDto) {
     return this.authService.login(loginDto);
   }
 
-  @Get()
+  @UseGuards(AuthGuard('jwt-user'))
+  @Get('test')
   findAll() {
-    return this.authService.findAll();
+    return { message: `Test de l'authetification` };
   }
 
   @Get(':id')

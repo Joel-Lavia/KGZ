@@ -9,7 +9,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { passWordlenth, sexeUsers } from 'src/core/enums/user.enum';
+import { audAuth, passWordlenth, sexeUsers } from 'src/core/enums/user.enum';
 
 export class RegistrationUserDto {
   @ApiPropertyOptional({
@@ -91,4 +91,8 @@ export class RegistrationUserDto {
   @IsNotEmpty()
   @MaxLength(13)
   telephone!: string;
+
+  @IsOptional()
+  @IsEnum(audAuth)
+  audUser?: audAuth;
 }

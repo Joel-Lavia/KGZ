@@ -11,3 +11,8 @@ export enum passWordlenth {
   MinLength = 15,
   MaxLength = 20,
 }
+export enum audAuth {
+  WebApp = 'Web',
+  MobileApp = 'Mobile',
+  WepAppAdmin = 'Web_admin',
+}

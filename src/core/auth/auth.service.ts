@@ -69,9 +69,10 @@ export class AuthService {
       }
       //================PAYLOAD===============
       let payload: payloadUser = {
-        id: user.id,
+        sub: user.id,
         userName: user.userName,
         role: user.role ?? [],
+        aud:loginDto.audUser!
       };
       //==============GENERATION TOKEN============
       const [access_token, refresh_token] = await Promise.all([
