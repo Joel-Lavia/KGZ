@@ -8,6 +8,7 @@ import { payloadUser } from '../interfaces/payload';
 import { JwtService } from '@nestjs/jwt';
 import { passwordService } from '../services/password/password.service';
 import { ApiResponse, responseLogin } from '../interfaces/apiResponse';
+import { audAuth, rolesUsers } from '../enums/user.enum';
 
 @Injectable()
 export class AuthService {
@@ -40,6 +41,8 @@ export class AuthService {
   }
   async login(loginDto: LoginAuthDto): Promise<ApiResponse<responseLogin>> {
     try {
+      let audience;
+
       //===============VERIFY USER================
       const user = await this.userModel
         .findOne({
@@ -68,11 +71,19 @@ export class AuthService {
         };
       }
       //================PAYLOAD===============
+      if (
+        user.role?.includes(rolesUsers.USER) ||
+        user.role?.includes(rolesUsers.SELLER)
+      ) {
+        audience = [audAuth.MobileApp,audAuth.WebApp];
+      } else if (user.role?.includes(rolesUsers.ADMIN)) {
+        audience = audAuth.WepAppAdmin;
+      }
       let payload: payloadUser = {
         sub: user.id,
         userName: user.userName,
         role: user.role ?? [],
-        aud:loginDto.audUser!
+        aud: audience!,
       };
       //==============GENERATION TOKEN============
       const [access_token, refresh_token] = await Promise.all([
@@ -94,11 +105,6 @@ export class AuthService {
       };
     }
   }
-
-
-
-
-  
 
   create(createAuthDto: LoginAuthDto) {
     return 'This action adds a new auth';

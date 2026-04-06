@@ -27,23 +27,33 @@ export class userJwtStrategy extends PassportStrategy(Strategy, 'jwt-user') {
 
   async validate(payload: payloadUser) {
     try {
+      let audience;
       const user = await this.userModel
         .findById(payload.sub, 'userName role')
         .lean()
         .exec();
       console.log('User ===>', user);
 
+      if (
+        user!.role?.includes(rolesUsers.USER) ||
+        user!.role?.includes(rolesUsers.SELLER)
+      ) {
+        audience = [audAuth.MobileApp, audAuth.WebApp];
+      } else if (user!.role?.includes(rolesUsers.ADMIN)) {
+        audience = audAuth.WepAppAdmin;
+      }
+
       if (!user || user === null) {
         throw new UnauthorizedException(`Utlisateur n'existe pas`);
       }
       if (payload.aud === audAuth.WepAppAdmin) {
-        throw new UnauthorizedException("admin reserve");
+        throw new UnauthorizedException();
       }
       return {
         sub: user.id,
         role: user.role,
         userName: user.userName,
-        aud: payload.aud,
+        aud: audience,
       };
     } catch (error: any) {
       throw new InternalServerErrorException(
