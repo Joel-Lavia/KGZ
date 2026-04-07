@@ -4,5 +4,6 @@ export interface payloadUser {
   sub: string;
   userName?: string;
   role: rolesUsers[];
-  aud:audAuth
+  aud: audAuth;
+  iss: string;
 }

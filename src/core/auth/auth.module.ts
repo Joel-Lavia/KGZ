@@ -25,4 +25,3 @@ dotenv.config();
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
-console.log('JWT_SECRETS ===>', process.env.JWT_SECRET);

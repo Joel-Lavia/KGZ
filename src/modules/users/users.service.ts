@@ -12,7 +12,9 @@ import { ApiResponse } from 'src/core/interfaces/apiResponse';
 import { passwordService } from 'src/core/services/password/password.service';
 import { JwtService } from '@nestjs/jwt';
 import { payloadUser } from 'src/core/interfaces/payload';
+import dotenv from 'dotenv';
 
+dotenv.config();
 @Injectable()
 export class UsersService {
   constructor(
@@ -88,7 +90,8 @@ export class UsersService {
         sub: user.id,
         userName: user.userName,
         role: user.role ?? [],
-        aud:registrationUserDto.audUser!
+        aud: registrationUserDto.audUser!,
+        iss: process.env.API_URL!,
       };
       //=============GENERATION TOKEN============
       const [acces_token, refresh_token] = await Promise.all([
@@ -131,11 +134,21 @@ export class UsersService {
     }
   }
 
-  async findOne() {
+  async findOne(
+    userId: string,
+  ): Promise<ApiResponse<userPublicDataResponse | null>> {
     try {
-      const user =  await this.userModel.findById()
-    } catch (error) {
-      
+      const user = await this.userModel.findById(userId);
+      return {
+        status: HttpStatus.FOUND,
+        message: `Donnéé Utilisateur trouvées`,
+        data: user,
+      };
+    } catch (error: any) {
+      return {
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: `Une erreur est survenue ${error.message}`,
+      };
     }
   }
 

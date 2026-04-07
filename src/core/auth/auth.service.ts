@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { passwordService } from '../services/password/password.service';
 import { ApiResponse, responseLogin } from '../interfaces/apiResponse';
 import { audAuth, rolesUsers } from '../enums/user.enum';
+import dotenv from 'dotenv';
 
 @Injectable()
 export class AuthService {
@@ -53,6 +54,8 @@ export class AuthService {
         })
         .select('password id userName role');
 
+      console.log(`User ===> ${user}`);
+
       if (!user) {
         return {
           status: HttpStatus.UNAUTHORIZED,
@@ -75,15 +78,16 @@ export class AuthService {
         user.role?.includes(rolesUsers.USER) ||
         user.role?.includes(rolesUsers.SELLER)
       ) {
-        audience = [audAuth.MobileApp,audAuth.WebApp];
+        audience = [audAuth.MobileApp, audAuth.WebApp];
       } else if (user.role?.includes(rolesUsers.ADMIN)) {
         audience = audAuth.WepAppAdmin;
       }
       let payload: payloadUser = {
-        sub: user.id,
+        sub: user._id.toString(),
         userName: user.userName,
         role: user.role ?? [],
         aud: audience!,
+        iss: process.env.API_URL!,
       };
       //==============GENERATION TOKEN============
       const [access_token, refresh_token] = await Promise.all([

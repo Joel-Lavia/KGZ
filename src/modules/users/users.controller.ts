@@ -6,29 +6,33 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegistrationUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from 'src/core/decorators/user';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post("registration")
+  @Post('registration')
   create(@Body() createUserDto: RegistrationUserDto) {
     return this.usersService.create(createUserDto);
   }
 
-  @Get("all")
+  @Get('all')
   findAll() {
     return this.usersService.findAll();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.usersService.findOne(id);
-  // }
+  @UseGuards(AuthGuard('jwt-user'))
+  @Get('user')
+  findOne(@User('sub') userId: string) {
+    return this.usersService.findOne(userId);
+  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {

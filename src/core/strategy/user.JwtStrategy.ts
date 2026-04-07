@@ -21,7 +21,8 @@ export class userJwtStrategy extends PassportStrategy(Strategy, 'jwt-user') {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET!,
-      audience: [audAuth.MobileApp, audAuth.WebApp, audAuth.WepAppAdmin],
+      audience: [audAuth.MobileApp, audAuth.WebApp],
+      issuer: process.env.API_URL,
     });
   }
 
@@ -32,7 +33,6 @@ export class userJwtStrategy extends PassportStrategy(Strategy, 'jwt-user') {
         .findById(payload.sub, 'userName role')
         .lean()
         .exec();
-      console.log('User ===>', user);
 
       if (
         user!.role?.includes(rolesUsers.USER) ||
@@ -44,16 +44,19 @@ export class userJwtStrategy extends PassportStrategy(Strategy, 'jwt-user') {
       }
 
       if (!user || user === null) {
-        throw new UnauthorizedException(`Utlisateur n'existe pas`);
+        throw new UnauthorizedException(`Utlisateur n'existe pas.`);
       }
-      if (payload.aud === audAuth.WepAppAdmin) {
+
+      if (payload.iss !== process.env.API_URL) {
         throw new UnauthorizedException();
       }
+
       return {
-        sub: user.id,
+        sub: user._id.toString(),
         role: user.role,
         userName: user.userName,
         aud: audience,
+        iss: process.env.API_URL,
       };
     } catch (error: any) {
       throw new InternalServerErrorException(
