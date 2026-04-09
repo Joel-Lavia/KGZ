@@ -24,7 +24,7 @@ export class JwtAuthGuard extends AuthGuard('jwt-user') {
       throw new UnauthorizedException('Token expiré.');
     }
     if (user.status === userStatut.Blocked) {
-      throw new UnauthorizedException('Votre compte a ete blocké:');
+      throw new UnauthorizedException('Votre compte a ete blocké.');
     }
 
     if (err || !user) {
