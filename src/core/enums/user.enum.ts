@@ -16,3 +16,8 @@ export enum audAuth {
   MobileApp = 'Mobile',
   WepAppAdmin = 'Web_admin',
 }
+export enum userStatut {
+  Blocked = 'Blocked',
+  Actif = 'Actif',
+  Inactif = 'Inactif',
+}

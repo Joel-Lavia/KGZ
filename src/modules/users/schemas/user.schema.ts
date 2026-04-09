@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, InferSchemaType } from 'mongoose';
-import { rolesUsers, sexeUsers } from 'src/core/enums/user.enum';
+import { rolesUsers, sexeUsers, userStatut } from 'src/core/enums/user.enum';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -29,13 +29,13 @@ export class User {
   @Prop({ required: true })
   lastName!: string;
 
-  @Prop({unique:true})
+  @Prop({ unique: true })
   userName?: string;
 
   @Prop({ type: String, enum: Object.values(sexeUsers) })
   sexe?: sexeUsers;
 
-  @Prop({unique:true})
+  @Prop({ unique: true })
   email?: string;
 
   @Prop({ required: true, select: false })
@@ -50,6 +50,13 @@ export class User {
     default: rolesUsers.USER,
   })
   role?: rolesUsers[];
+
+  @Prop({
+    type: String,
+    enum: Object.values(userStatut),
+    default: userStatut.Actif,
+  })
+  status!: userStatut;
 }
 export type UserDataResponse = InferSchemaType<typeof UsersChema>;
 export type userPublicDataResponse = Omit<

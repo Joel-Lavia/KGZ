@@ -13,6 +13,7 @@ import { RegistrationUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/core/decorators/user';
+import { JwtAuthGuard } from 'src/core/guards/user.guard';
 
 @Controller('users')
 export class UsersController {
@@ -28,7 +29,7 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @UseGuards(AuthGuard('jwt-user'))
+  @UseGuards(JwtAuthGuard)
   @Get('user')
   findOne(@User('sub') userId: string) {
     return this.usersService.findOne(userId);

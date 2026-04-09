@@ -52,13 +52,11 @@ export class AuthService {
             { telephone: loginDto.telephone },
           ],
         })
-        .select('password id userName role');
-
-      console.log(`User ===> ${user}`);
+        .select('password id userName role status');
 
       if (!user) {
         return {
-          status: HttpStatus.UNAUTHORIZED,
+          statusCode: HttpStatus.UNAUTHORIZED,
           message: `Identifiant incorrect.`,
         };
       }
@@ -69,7 +67,7 @@ export class AuthService {
       );
       if (!validePassWord) {
         return {
-          status: HttpStatus.UNAUTHORIZED,
+          statusCode: HttpStatus.UNAUTHORIZED,
           message: `Mot de passe incorrecte.`,
         };
       }
@@ -82,12 +80,15 @@ export class AuthService {
       } else if (user.role?.includes(rolesUsers.ADMIN)) {
         audience = audAuth.WepAppAdmin;
       }
+      console.log('Status user ===>', user.status);
+
       let payload: payloadUser = {
         sub: user._id.toString(),
         userName: user.userName,
         role: user.role ?? [],
         aud: audience!,
         iss: process.env.API_URL!,
+        status: user.status,
       };
       //==============GENERATION TOKEN============
       const [access_token, refresh_token] = await Promise.all([
@@ -99,12 +100,12 @@ export class AuthService {
       ]);
 
       return {
-        status: HttpStatus.ACCEPTED,
+        statusCode: HttpStatus.ACCEPTED,
         data: { access_token, refresh_token },
       };
     } catch (error: any) {
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Une erreur est survenu ${error.message}`,
       };
     }

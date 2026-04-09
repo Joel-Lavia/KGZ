@@ -6,4 +6,5 @@ export interface payloadUser {
   role: rolesUsers[];
   aud: audAuth;
   iss: string;
+  status: string;
 }

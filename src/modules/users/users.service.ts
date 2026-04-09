@@ -43,7 +43,7 @@ export class UsersService {
 
         if (emailExist) {
           return {
-            status: HttpStatus.CONFLICT,
+            statusCode: HttpStatus.CONFLICT,
             message: `${message} ${registrationUserDto.email}`,
           };
         }
@@ -56,7 +56,7 @@ export class UsersService {
 
         if (phoneExist) {
           return {
-            status: HttpStatus.CONFLICT,
+            statusCode: HttpStatus.CONFLICT,
             message: `${message} ${registrationUserDto.telephone}`,
           };
         }
@@ -68,7 +68,7 @@ export class UsersService {
 
         if (userNameExist) {
           return {
-            status: HttpStatus.CONFLICT,
+            statusCode: HttpStatus.CONFLICT,
             message: `${message} ${registrationUserDto.userName}`,
           };
         }
@@ -92,6 +92,7 @@ export class UsersService {
         role: user.role ?? [],
         aud: registrationUserDto.audUser!,
         iss: process.env.API_URL!,
+        status: user.status,
       };
       //=============GENERATION TOKEN============
       const [acces_token, refresh_token] = await Promise.all([
@@ -103,7 +104,7 @@ export class UsersService {
       ]);
 
       return {
-        status: HttpStatus.CREATED,
+        statusCode: HttpStatus.CREATED,
         message: `Enregistrement réussi, bienvenue ${user.name} ${user.lastName}`,
         data: {
           acces_token,
@@ -112,7 +113,7 @@ export class UsersService {
       };
     } catch (error: any) {
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Une erreur est survenue ${error.message}`,
       };
     }
@@ -122,13 +123,13 @@ export class UsersService {
     try {
       const allUsers = await this.userModel.find();
       return {
-        status: HttpStatus.FOUND,
+        statusCode: HttpStatus.FOUND,
         message: 'Tous les utilisateurs trouvent avec succès.',
         data: allUsers,
       };
     } catch (error: any) {
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Une erreur est survenue ${error.message}`,
       };
     }
@@ -140,13 +141,13 @@ export class UsersService {
     try {
       const user = await this.userModel.findById(userId);
       return {
-        status: HttpStatus.FOUND,
+        statusCode: HttpStatus.FOUND,
         message: `Donnéé Utilisateur trouvées`,
         data: user,
       };
     } catch (error: any) {
       return {
-        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
         message: `Une erreur est survenue ${error.message}`,
       };
     }

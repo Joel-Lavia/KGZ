@@ -21,7 +21,7 @@ export class userJwtStrategy extends PassportStrategy(Strategy, 'jwt-user') {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: process.env.JWT_SECRET!,
-      audience: [audAuth.MobileApp, audAuth.WebApp],
+      audience: [audAuth.MobileApp, audAuth.WebApp, audAuth.WepAppAdmin],
       issuer: process.env.API_URL,
     });
   }
@@ -29,10 +29,12 @@ export class userJwtStrategy extends PassportStrategy(Strategy, 'jwt-user') {
   async validate(payload: payloadUser) {
     try {
       let audience;
-      const user = await this.userModel
-        .findById(payload.sub, 'userName role')
-        .lean()
-        .exec();
+      const user = await this.userModel.findById(
+        payload.sub,
+        'role status sub userName',
+      );
+
+      console.log('User dans la trategie', user);
 
       if (
         user!.role?.includes(rolesUsers.USER) ||
@@ -57,6 +59,7 @@ export class userJwtStrategy extends PassportStrategy(Strategy, 'jwt-user') {
         userName: user.userName,
         aud: audience,
         iss: process.env.API_URL,
+        status: user.status,
       };
     } catch (error: any) {
       throw new InternalServerErrorException(
