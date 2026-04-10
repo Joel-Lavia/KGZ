@@ -13,17 +13,18 @@ import { AuthService } from './auth.service';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { Public } from '../decorators/PublicPath';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @Public()
   @Post('Login')
   async login(@Body() loginDto: LoginAuthDto) {
     return this.authService.login(loginDto);
   }
 
-  @UseGuards(AuthGuard('jwt-user'))
   @Get('test')
   findAll() {
     return { message: `Test de l'authetification` };

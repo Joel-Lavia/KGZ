@@ -12,7 +12,7 @@ import { UsersService } from './users.service';
 import { RegistrationUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { User } from 'src/core/decorators/user';
+import { User } from 'src/core/decorators/userConnected';
 import { JwtAuthGuard } from 'src/core/guards/user.guard';
 
 @Controller('users')
