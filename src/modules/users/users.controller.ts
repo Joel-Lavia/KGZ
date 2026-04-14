@@ -20,7 +20,8 @@ import { JwtAuthGuard } from 'src/core/guards/user.guard';
 import { Roles } from 'src/core/decorators/role';
 import { rolesUsers, userStatut } from 'src/core/enums/user.enum';
 import { link } from 'fs';
-
+import { ApiTags } from '@nestjs/swagger';
+@ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
