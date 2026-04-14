@@ -10,8 +10,8 @@ export type UserDocument = HydratedDocument<User>;
     transform: (doc, ret: any) => {
       delete ret.password;
       delete ret.__v;
-      ret.id = ret._id;
-      delete ret._id;
+      // ret.id = ret._id;delete ret.__v;
+      // delete ret._id;
       return ret;
     },
   },

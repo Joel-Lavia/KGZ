@@ -7,6 +7,9 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
+  ParseIntPipe,
+  DefaultValuePipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegistrationUserDto } from './dto/create-user.dto';
@@ -15,7 +18,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/core/decorators/userConnected';
 import { JwtAuthGuard } from 'src/core/guards/user.guard';
 import { Roles } from 'src/core/decorators/role';
-import { rolesUsers } from 'src/core/enums/user.enum';
+import { rolesUsers, userStatut } from 'src/core/enums/user.enum';
+import { link } from 'fs';
 
 @Controller('users')
 export class UsersController {
@@ -37,13 +41,25 @@ export class UsersController {
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto);
   }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  //================ADMIN===============
+  // @Roles(rolesUsers.ADMIN)
+  @Delete('delete/:userId')
+  remove(@Param('userId') userId: string) {
+    return this.usersService.remove(userId);
   }
+  // @Roles(rolesUsers.ADMIN)
   @Get('all')
-  findAll() {
-    return this.usersService.findAll();
+  findAll(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit?: number,
+  ) {
+    return this.usersService.findAll(page, limit);
+  }
+  @Patch('block/:userId')
+  blockUser(
+    @Param('userId') userId: string,
+    @Body('status') status: userStatut,
+  ) {
+    return this.usersService.blockUser(userId, status);
   }
 }

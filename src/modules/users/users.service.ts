@@ -8,11 +8,12 @@ import {
   userPublicDataResponse,
 } from './schemas/user.schema';
 import { Model } from 'mongoose';
-import { ApiResponse } from 'src/core/interfaces/apiResponse';
+import { allUsers, ApiResponse } from 'src/core/interfaces/apiResponse';
 import { passwordService } from 'src/core/services/password/password.service';
 import { JwtService } from '@nestjs/jwt';
 import { payloadUser } from 'src/core/interfaces/payload';
 import dotenv from 'dotenv';
+import { userStatut } from 'src/core/enums/user.enum';
 
 dotenv.config();
 @Injectable()
@@ -119,22 +120,6 @@ export class UsersService {
     }
   }
 
-  async findAll(): Promise<ApiResponse<userPublicDataResponse[]>> {
-    try {
-      const allUsers = await this.userModel.find();
-      return {
-        statusCode: HttpStatus.FOUND,
-        message: 'Tous les utilisateurs trouvent avec succès.',
-        data: allUsers,
-      };
-    } catch (error: any) {
-      return {
-        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-        message: `Une erreur est survenue ${error.message}`,
-      };
-    }
-  }
-
   async findOne(
     userId: string,
   ): Promise<ApiResponse<userPublicDataResponse | null>> {
@@ -157,7 +142,73 @@ export class UsersService {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  //========================ADMIN===================================
+  //=================FINDALL USER============================
+  async findAll(
+    page?: number,
+    limit?: number,
+  ): Promise<ApiResponse<{ allUsers: UserDocument[]; count: number }>> {
+    try {
+      const skip = (page! - 1) * limit!;
+
+      const [allUsers, count] = await Promise.all([
+        this.userModel.find().skip(skip).limit(limit!),
+        this.userModel.countDocuments(),
+      ]);
+      console.log('count ===>', count);
+      return {
+        statusCode: HttpStatus.FOUND,
+        message: 'Tous les utilisateurs trouvent avec succès.',
+        data: {
+          allUsers,
+          count,
+        },
+      };
+    } catch (error: any) {
+      return {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: `Une erreur est survenue ${error.message}`,
+      };
+    }
+  }
+  //=================BLOCK USER============================
+  async blockUser(
+    userId: string,
+    userStatus:userStatut
+  ): Promise<ApiResponse<userPublicDataResponse | null>> {
+    try {
+      const blockUser = await this.userModel.findOneAndUpdate(
+        { _id: userId },
+        { status: userStatus },
+        { returnDocument: 'after' },
+      );
+      return {
+        statusCode: HttpStatus.ACCEPTED,
+        message: `Utilisateur blocker avec succes.`,
+        // data: blockUser,
+      };
+    } catch (error: any) {
+      return {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: `Une erreur est survenue ${error.message}`,
+      };
+    }
+  }
+  //=================REMOVE USER============================
+  async remove(userId: string): Promise<ApiResponse<string>> {
+    try {
+      const userDelete = await this.userModel.deleteOne({ _id: userId });
+      console.log('response', userDelete);
+
+      return {
+        statusCode: HttpStatus.ACCEPTED,
+        message: `Utilisateur supprimé avec succes.`,
+      };
+    } catch (error: any) {
+      return {
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: `Une erreur est survenue ${error.message}`,
+      };
+    }
   }
 }
