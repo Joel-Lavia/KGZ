@@ -6,6 +6,7 @@ import { mongoConfig } from './core/db/config/database.config';
 import { UsersModule } from './modules/users/users.module';
 import { ConfigModule } from '@nestjs/config';
 import { JwtAuthGuard } from './core/guards/user.guard';
+import { RolesGuard } from './core/guards/role.guard';
 
 @Module({
   imports: [
@@ -16,6 +17,10 @@ import { JwtAuthGuard } from './core/guards/user.guard';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService, { provide: 'APP_GUARD', useClass: JwtAuthGuard }],
+  providers: [
+    AppService,
+    { provide: 'APP_GUARD', useClass: JwtAuthGuard },
+    { provide: 'APP_GUARD', useClass: RolesGuard },
+  ],
 })
 export class AppModule {}
