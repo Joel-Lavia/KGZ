@@ -28,9 +28,11 @@
 ## Project setup
 
 ```bash
+#install dependencies
 $ pnpm install
+#generate modules
+$ nest g resource nom-de-ta-ressource
 ```
-
 ## Compile and run the project
 
 ```bash
