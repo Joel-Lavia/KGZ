@@ -21,11 +21,13 @@ import { Roles } from 'src/core/decorators/role';
 import { rolesUsers, userStatut } from 'src/core/enums/user.enum';
 import { link } from 'fs';
 import { ApiTags } from '@nestjs/swagger';
+import { Public } from 'src/core/decorators/PublicPath';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Public()
   @Post('registration')
   create(@Body() createUserDto: RegistrationUserDto) {
     return this.usersService.create(createUserDto);

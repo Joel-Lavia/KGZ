@@ -155,7 +155,6 @@ export class UsersService {
         this.userModel.find().skip(skip).limit(limit!),
         this.userModel.countDocuments(),
       ]);
-      console.log('count ===>', count);
       return {
         statusCode: HttpStatus.FOUND,
         message: 'Tous les utilisateurs trouvent avec succès.',
@@ -174,7 +173,7 @@ export class UsersService {
   //=================BLOCK USER============================
   async blockUser(
     userId: string,
-    userStatus:userStatut
+    userStatus: userStatut,
   ): Promise<ApiResponse<userPublicDataResponse | null>> {
     try {
       const blockUser = await this.userModel.findOneAndUpdate(

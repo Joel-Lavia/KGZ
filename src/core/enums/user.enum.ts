@@ -8,8 +8,8 @@ export enum sexeUsers {
   FEMALE = 'Female',
 }
 export enum passWordlenth {
-  MinLength = 15,
-  MaxLength = 20,
+  MinLength = 10,
+  MaxLength = 15,
 }
 export enum audAuth {
   WebApp = 'Web',

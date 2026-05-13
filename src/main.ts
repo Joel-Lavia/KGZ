@@ -3,12 +3,17 @@ import { AppModule } from './app.module';
 import dotenv from 'dotenv';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { cors } from 'cors';
 dotenv.config();
 
 async function bootstrap() {
   const PORT = process.env.PORT;
   const app = await NestFactory.create(AppModule);
-  console.log('JWT_SECRET ===>', process.env.JWT_SECRET);
+  //===========CORS CONFIG=========================
+  app.enableCors({
+    origin: 'http://localhost:3000',
+    credentials: true,
+  });
   //===========SWAGGER CONFIG======================
   app.setGlobalPrefix('KGZ/v1');
   const config = new DocumentBuilder()
