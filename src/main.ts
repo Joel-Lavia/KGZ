@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { cors } from 'cors';
+import cookieParser from 'cookie-parser';
+
 dotenv.config();
 
 async function bootstrap() {
@@ -14,6 +16,7 @@ async function bootstrap() {
     origin: 'http://localhost:3000',
     credentials: true,
   });
+  app.use(cookieParser());
   //===========SWAGGER CONFIG======================
   app.setGlobalPrefix('KGZ/v1');
   const config = new DocumentBuilder()

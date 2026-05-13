@@ -10,6 +10,7 @@ import {
   Query,
   ParseIntPipe,
   DefaultValuePipe,
+  Res,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { RegistrationUserDto } from './dto/create-user.dto';
@@ -22,6 +23,7 @@ import { rolesUsers, userStatut } from 'src/core/enums/user.enum';
 import { link } from 'fs';
 import { ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/core/decorators/PublicPath';
+import type { Response } from 'express';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
@@ -29,8 +31,31 @@ export class UsersController {
 
   @Public()
   @Post('registration')
-  create(@Body() createUserDto: RegistrationUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(
+    @Body() createUserDto: RegistrationUserDto,
+    @Res({ passthrough: true }) response: Response,
+  ) {
+    const createUser = await this.usersService.create(createUserDto);
+    //==========TOKEN==============================================
+    response.cookie('token-auth', createUser.data?.acces_token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'strict',
+      maxAge: 1000 * 60 * 60 * 24,
+      path: '/',
+      domain: 'localhost',
+    });
+    //=============REFRESH TOKEN=================================
+    response.cookie('refresh-token-auth', createUser.data?.refresh_token, {
+      httpOnly: true,
+      secure: false, // true en production
+      sameSite: 'strict',
+      maxAge: 1000 * 60 * 60 * 24 * 7, // Plus long ! (Ex: expire après 7 jours)
+      path: '/auth/refresh', // Optionnel: envoyé UNIQUEMENT à la route qui rafraîchit le token
+      domain: 'localhost',
+    });
+
+    return createUser;
   }
 
   @Roles(rolesUsers.ADMIN, rolesUsers.SELLER, rolesUsers.USER)
