@@ -37,23 +37,23 @@ export class UsersController {
   ) {
     const createUser = await this.usersService.create(createUserDto);
     //==========TOKEN==============================================
-    response.cookie('token-auth', createUser.data?.acces_token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: 'strict',
-      maxAge: 1000 * 60 * 60 * 24,
-      path: '/',
-      domain: 'localhost',
-    });
-    //=============REFRESH TOKEN=================================
-    response.cookie('refresh-token-auth', createUser.data?.refresh_token, {
-      httpOnly: true,
-      secure: false, // true en production
-      sameSite: 'strict',
-      maxAge: 1000 * 60 * 60 * 24 * 7, // Plus long ! (Ex: expire après 7 jours)
-      path: '/auth/refresh', // Optionnel: envoyé UNIQUEMENT à la route qui rafraîchit le token
-      domain: 'localhost',
-    });
+    // response.cookie('token-auth', createUser.data?.acces_token, {
+    //   httpOnly: true,
+    //   secure: false,
+    //   sameSite: 'strict',
+    //   maxAge: 1000 * 60 * 60 * 24,
+    //   path: '/',
+    //   domain: 'localhost',
+    // });
+    // //=============REFRESH TOKEN=================================
+    // response.cookie('refresh-token-auth', createUser.data?.refresh_token, {
+    //   httpOnly: true,
+    //   secure: false, // true en production
+    //   sameSite: 'strict',
+    //   maxAge: 1000 * 60 * 60 * 24 * 7, // Plus long ! (Ex: expire après 7 jours)
+    //   path: '/auth/refresh', // Optionnel: envoyé UNIQUEMENT à la route qui rafraîchit le token
+    //   domain: 'localhost',
+    // });
 
     return createUser;
   }
