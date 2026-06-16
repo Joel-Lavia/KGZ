@@ -1,4 +1,5 @@
 import { rolesUsers } from '../enums/user.enum';
+import { payloadUser } from './payload';
 
 export interface ApiResponse<T> {
   statusCode: number;
@@ -6,6 +7,7 @@ export interface ApiResponse<T> {
   data?: T;
 }
 export interface responseLogin {
+  user?: payloadUser;
   access_token: string;
   refresh_token: string;
 }
