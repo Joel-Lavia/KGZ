@@ -101,7 +101,7 @@ export class AuthService {
 
       return {
         statusCode: HttpStatus.ACCEPTED,
-        data: { user:payload ,access_token, refresh_token },
+        data: { user: payload, access_token, refresh_token },
       };
     } catch (error: any) {
       return {
