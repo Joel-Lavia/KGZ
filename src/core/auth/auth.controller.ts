@@ -14,6 +14,9 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Public } from '../decorators/PublicPath';
+import { Roles } from '../decorators/role';
+import { rolesUsers } from '../enums/user.enum';
+import { User } from '../decorators/userConnected';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +26,11 @@ export class AuthController {
   @Post('Login')
   async login(@Body() loginDto: LoginAuthDto) {
     return this.authService.login(loginDto);
+  }
+  @Roles(rolesUsers.ADMIN, rolesUsers.SELLER, rolesUsers.USER)
+  @Get('me')
+  async me(@User() user) {
+    return user;
   }
 
   @Get('test')

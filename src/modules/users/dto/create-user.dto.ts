@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsString,
   IsOptional,
@@ -18,13 +19,14 @@ export class RegistrationUserDto {
   })
   @IsString()
   @IsOptional()
+  @Transform(({ value }) => (value === null ? undefined : value))
   profilImages?: string;
 
   @ApiProperty({
     description: "Nom complet affiché de l'utilisateur",
     example: 'Joel Lavia',
   })
-  @IsString()
+  @IsString({ message: `Le nom est obligatoire` })
   @IsNotEmpty()
   name!: string;
 
@@ -32,8 +34,8 @@ export class RegistrationUserDto {
     description: "Prénom de l'utilisateur",
     example: 'Joel',
   })
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: `Le Prenom` })
+  @IsOptional()
   firstName!: string;
 
   @ApiProperty({
@@ -48,7 +50,7 @@ export class RegistrationUserDto {
     description: 'Nom utilisateur',
     example: 'Kindkey87',
   })
-  @IsString()
+  @IsString({ message: `UserName est obligatoire` })
   userName?: string;
 
   @ApiPropertyOptional({
@@ -57,14 +59,14 @@ export class RegistrationUserDto {
     example: sexeUsers.FEMALE,
   })
   @IsOptional()
-  @IsEnum(sexeUsers)
+  @IsEnum(sexeUsers, { message: 'Sexe invalide' })
   sexe?: sexeUsers;
 
   @ApiPropertyOptional({
     description: "Adresse email de l'utilisateur",
     example: 'joel@example.com',
   })
-  @IsEmail()
+  @IsEmail({}, { message: 'Email invalide' })
   @IsString()
   @IsOptional()
   email!: string;
@@ -77,8 +79,12 @@ export class RegistrationUserDto {
   })
   @IsString()
   @IsNotEmpty()
-  @MinLength(passWordlenth.MinLength)
-  @MaxLength(passWordlenth.MaxLength)
+  @MinLength(passWordlenth.MinLength, {
+    message: `Le mot de passe doit avoir une longeur Minimale de ${passWordlenth.MinLength} caracteres `,
+  })
+  @MaxLength(passWordlenth.MaxLength, {
+    message: `Le mot de passe doit avoir une longeur Maximale de ${passWordlenth.MaxLength} caracteres`,
+  })
   password!: string;
 
   @ApiProperty({
@@ -86,7 +92,9 @@ export class RegistrationUserDto {
     example: '+243812345678',
     maxLength: 13,
   })
-  @IsPhoneNumber()
+  @IsPhoneNumber(undefined, {
+    message: `Le numéro doit être au format international (ex: +243...)`,
+  })
   @IsString()
   @IsNotEmpty()
   @MaxLength(13)
