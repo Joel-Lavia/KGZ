@@ -25,6 +25,7 @@ export class UsersService {
   ) {}
   async create(registrationUserDto: RegistrationUserDto): Promise<
     ApiResponse<{
+      user: UserDocument;
       acces_token: string;
       refresh_token: string;
     }>
@@ -108,6 +109,7 @@ export class UsersService {
         statusCode: HttpStatus.CREATED,
         message: `Enregistrement réussi, bienvenue ${user.name} ${user.lastName}`,
         data: {
+          user:user,
           acces_token,
           refresh_token,
         },
